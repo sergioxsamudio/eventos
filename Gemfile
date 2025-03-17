@@ -22,7 +22,7 @@ gem 'kaminari'
 gem 'ransack'         
 gem 'toastr-rails' 
 gem 'caxlsx_rails'
-gem 'carrierwave', '~> 2.2'
+gem 'carrierwave', '~> 3.1'
 gem "fiddle"
 gem "autoprefixer-rails"
 gem 'letter_opener'
