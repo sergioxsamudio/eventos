@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <!-- Mantener los estilos -->
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_include_tag "application", "data-turbo-track": "reload" %>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+  <!-- Navbar fijo arriba -->
+  <nav class="bg-white shadow-md p-4 fixed w-full top-0 z-50">
+    <div class="container mx-auto flex justify-between items-center">
+      <!-- Saludo personalizado y ranking -->
+      <% if user_signed_in? %>
+        <% user_score = current_user.score || 0 %>
+        <% rank = case user_score
+             when 0..499 then "Hierro"
+             when 500..999 then "Bronce"
+             when 1000..1999 then "Plata"
+             when 2000..3499 then "Oro"
+             when 3500..4999 then "Platino"
+             else "Diamante"
+             end %>
+        <div class="flex flex-col items-center">
+          <p class="text-xl font-bold text-gray-800">Hola, <%= current_user.first_name %>!</p>
+          <p class="text-md text-gray-600">Puntos: <%= user_score %></p>
+          <p id="rank" class="text-md font-bold transition-transform duration-500 p-1 rounded-md" data-rank="<%= rank %>"><%= rank %></p>
+        </div>
+      <% end %>
+
+      <!-- Menú hamburguesa en móviles -->
+      <button type="button" class="md:hidden text-gray-800 text-2xl focus:outline-none" id="menu-button">
+        ☰
+      </button>
+
+      <!-- Links de navegación -->
+      <div class="hidden md:flex items-center space-x-6" id="navbarNav">
+        <ul class="flex space-x-4">
+          <% if user_signed_in? %>
+            <li><%= link_to t("layout.nav.home"), root_path, class: "nav-link" %></li>
+            <li><%= link_to t("layout.nav.my_events"), my_events_events_path, class: "nav-link" %></li>
+            <li><%= link_to t("layout.nav.edit_labels"), edit_labels_users_path, class: "nav-link text-blue-500 hover:text-blue-700 transition" %></li>
+            <li><%= link_to t("layout.nav.edit_profile"), edit_user_registration_path, class: "nav-link text-yellow-500 hover:text-yellow-700 transition" %></li>
+            <% if current_user.has_role?(:admin) %>
+              <li><%= link_to t("layout.nav.users"), users_path, class: "nav-link" %></li>
+              <li><%= link_to t("layout.nav.events"), events_path, class: "nav-link" %></li>
+              <li><%= link_to t("layout.nav.labels"), labels_path, class: "nav-link" %></li>
+              <!-- Botón de escanear QR (solo para admins) -->
+              <li>
+                <%= link_to t("layout.nav.scan_qr"), scan_qr_users_url, class: "px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition" %>
+              </li>
+            <% end %>
+          <% end %>
+        </ul>
+
+        <!-- Cambio de idioma -->
+        <div class="flex items-center space-x-2">
+          <%= link_to "🇪🇸", url_for(locale: :es), class: "text-xl hover:opacity-70 transition" %>
+          <%= link_to "🇬🇧", url_for(locale: :en), class: "text-xl hover:opacity-70 transition" %>
+        </div>
+
+        <!-- Botones de sesión -->
+        <% if user_signed_in? %>
+          <%= button_to t("layout.nav.logout"), destroy_user_session_path, method: :delete, class: "px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition" %>
+        <% else %>
+          <%= link_to t("layout.nav.login"), new_user_session_path, class: "px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition" %>
+        <% end %>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Agregar espacio para evitar que el navbar cubra contenido -->
+  <div class="pt-20 container mx-auto">
+    <%= yield %>
+  </div>
+
+  <script>
+    document.getElementById('menu-button').addEventListener('click', function () {
+      document.getElementById('navbarNav').classList.toggle('hidden');
+    });
+
+    // Animación del ranking
+    document.addEventListener("DOMContentLoaded", function () {
+      const rankElement = document.getElementById("rank");
+      const rank = rankElement.getAttribute("data-rank");
+      let color = "gray-500";
+
+      switch (rank) {
+        case "Hierro": color = "bg-gray-500"; break;
+        case "Bronce": color = "bg-yellow-700"; break;
+        case "Plata": color = "bg-gray-300"; break;
+        case "Oro": color = "bg-yellow-500"; break;
+        case "Platino": color = "bg-blue-400"; break;
+        case "Diamante": color = "bg-blue-600"; break;
+      }
+
+      rankElement.classList.add(color, "text-white", "p-2", "rounded-md", "animate-pulse");
+    });
+  </script>
+</body>
+</html>
+
+

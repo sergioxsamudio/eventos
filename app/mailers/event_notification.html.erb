@@ -1,0 +1,20 @@
+<h1>¡Hola <%= @user.first_name %>!</h1>
+<p>Te has inscrito con éxito en el evento "<%= @event.title %>".</p>
+
+<p>Para confirmar tu asistencia, escanea el siguiente código QR al llegar al evento:</p>
+
+<% if @qr_svg.present? %>
+  <div>
+    <%= raw @qr_svg %>  <!-- Inserta el QR como SVG en el correo -->
+  </div>
+<% else %>
+  <p>⚠️ No se pudo generar el código QR. Contacta con soporte.</p>
+<% end %>
+
+<p><strong>Detalles del evento:</strong></p>
+<ul>
+  <li><strong>📅 Fecha:</strong> <%= @event.start_time.strftime("%d/%m/%Y %H:%M") %> - <%= @event.end_time.strftime("%d/%m/%Y %H:%M") %></li>
+  </ul>
+
+<p>¡Nos vemos en el evento! 🎉</p>
+

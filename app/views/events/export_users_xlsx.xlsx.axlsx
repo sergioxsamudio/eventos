@@ -1,0 +1,12 @@
+wb = xlsx_package.workbook
+
+wb.add_worksheet(name: "Usuarios") do |sheet|
+  sheet.add_row ["Nombre", "Email", "Teléfono", "Asistencia"]
+
+  @users.each do |user|
+    event_user = EventUser.find_by(user: user, event: @event)
+    asistencia = event_user&.attended? ? "✅ Sí" : "❌ No"
+
+    sheet.add_row [user.first_name + " " + user.last_name, user.email, user.phone_number.presence || "No disponible", asistencia]
+  end
+end

@@ -1,0 +1,84 @@
+@use "bootstrap/scss/bootstrap";
+@use "custom";  // Asegúrate de que tu archivo custom.scss esté configurado correctamente
+
+
+
+// 🌟 NAVBAR ESTILOS
+.navbar-custom {
+    background: linear-gradient(90deg, #007bff, #0056b3); // Fondo con gradiente
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); // Sombra elegante
+    transition: background 0.3s ease-in-out;
+  
+    .navbar-brand {
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+  
+    .nav-link {
+      color: white !important;
+      font-weight: 500;
+      transition: color 0.3s ease-in-out;
+  
+      &:hover {
+        color: #ffcc00 !important; // Cambio de color al pasar el mouse
+      }
+    }
+  
+    .navbar-toggler {
+      border: none;
+      &:focus {
+        outline: none;
+        box-shadow: none;
+      }
+    }
+  }
+  
+  // 🌟 BOTONES PERSONALIZADOS
+  .btn-custom {
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+  
+    &.btn-danger:hover {
+      background-color: #ff4444;
+    }
+  
+    &.btn-success:hover {
+      background-color: #00cc66;
+    }
+  }
+  
+  // 🌟 IDIOMAS
+  .language-switcher {
+    a {
+      color: white;
+      font-size: 1.2rem;
+      margin: 0 5px;
+      transition: color 0.3s ease-in-out;
+  
+      &:hover {
+        color: #ffcc00;
+      }
+    }
+  }
+  // Asegúrate de importar Bootstrap si aún no lo hiciste
+
+.container {
+  max-width: 400px;
+}
+
+.card {
+  border-radius: 10px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+.btn-primary {
+  transition: background-color 0.3s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}

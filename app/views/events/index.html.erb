@@ -1,0 +1,111 @@
+<h1 class="text-3xl font-bold text-center my-6"><%= t("events.index.title") %></h1>
+
+<!-- 🔍 Formulario de búsqueda -->
+<%= search_form_for @q, url: events_path, method: :get, html: { class: "bg-white shadow-md rounded-lg p-6 mb-6 max-w-3xl mx-auto" } do |f| %>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div>
+      <%= f.label :title_cont, t("events.index.search_title"), class: "block text-gray-700 font-semibold mb-1" %>
+      <%= f.text_field :title_cont, class: "border border-gray-300 rounded-md p-2 w-full focus:ring focus:ring-blue-300" %>
+    </div>
+    
+    <div>
+      <%= f.label :labels_name_cont, t("events.index.labels"), class: "block text-gray-700 font-semibold mb-1" %>
+      <%= f.text_field :labels_name_cont, placeholder: t("events.index.search_placeholder"), class: "border border-gray-300 rounded-md p-2 w-full focus:ring focus:ring-blue-300" %>
+    </div>
+
+    <div class="flex items-end">
+      <%= f.submit t("events.index.search_button"), class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition w-full" %>
+    </div>
+  </div>
+<% end %>
+
+<!-- ✅ Botón para crear nuevo evento (solo admin) -->
+<% if current_user.has_role?(:admin) %>
+  <div class="text-right mb-6">
+    <%= link_to new_event_path, class: "bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition flex items-center gap-2 w-fit mx-auto md:mx-0" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      <%= t("events.index.new_event") %>
+    <% end %>
+  </div>
+<% end %>
+
+<!-- 🎟️ Grid de Eventos -->
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+  <% @events.each do |event| %>
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden transform transition hover:scale-105">
+      <!-- 📷 Imagen del Evento -->
+      <% if event.images.attached? %>
+        <%= image_tag event.images.first, class: "w-full h-40 object-cover" %>
+      <% else %>
+        <div class="w-full h-40 bg-gray-300 flex items-center justify-center text-gray-600">
+          📷 <%= t("events.index.no_images") %>
+        </div>
+      <% end %>
+
+      <div class="p-4">
+        <!-- 📌 Título del Evento -->
+        <h3 class="text-xl font-semibold text-gray-800"><%= link_to event.title, event_path(event), class: "hover:text-blue-600" %></h3>    
+
+        <!-- 🏷️ Etiquetas -->
+        <div class="mt-2">
+          <% if event.labels.any? %>
+            <% event.labels.each do |label| %>
+              <span class="bg-blue-100 text-blue-600 text-xs font-semibold px-2 py-1 rounded-md mr-1"><%= label.name %></span>
+            <% end %>
+          <% else %>
+            <span class="text-gray-500"><%= t("events.index.no_labels") %></span>
+          <% end %>
+        </div>
+
+        <!-- 📅 Fechas -->
+        <p class="text-gray-600 text-sm mt-2">
+          🕒 <strong><%= event.start_time.strftime("%d/%m/%Y %H:%M") %></strong> → <strong><%= event.end_time.strftime("%d/%m/%Y %H:%M") %></strong>
+        </p>
+
+        <!-- 🎟️ Botones de Acción -->
+        <div class="mt-4 flex flex-col space-y-2">
+          <% if event.end_time > Time.current %>
+            <% unless current_user.events.exists?(event.id) %>
+              <%= button_to register_event_path(event), method: :post, class: "bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-md transition flex items-center justify-center gap-2 w-full" do %>
+                ✅ <%= t("events.index.register") %>
+              <% end %>
+            <% else %>
+              <span class="text-gray-500 font-semibold text-center"><%= t("events.index.already_registered") %></span>
+            <% end %>
+          <% end %>
+        </div>
+
+        <!-- 🛠️ Acciones para Admin -->
+        <% if current_user.has_role?(:admin) %>
+          <div class="mt-4 flex flex-col space-y-2">
+            <%= link_to event_users_event_path(event),
+                        class: "bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md transition flex items-center justify-center gap-2 w-full" do %>
+              👥 <%= t("events.index.view_users") %>
+            <% end %>
+
+            <!-- 📥 Botón para descargar lista en Excel -->
+            <%= link_to export_users_xlsx_event_path(event, format: :xlsx),
+                        class: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition w-full text-center mt-3" do %>   
+              📥 <%= t("events.index.download_users") %>
+            <% end %>
+            
+            <!-- 🔄 Botón para actualizar puntos -->
+            <%= button_to update_points_event_path(event), method: :post, data: { confirm: t("events.index.confirm_update_points") },
+              class: "bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-md transition w-full text-center mt-3" do %>
+              🔄 <%= t("events.index.update_points") %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<!-- 📄 Paginación -->
+<div class="mt-6 flex justify-center">
+  <%= paginate @events %>
+</div>
+
+

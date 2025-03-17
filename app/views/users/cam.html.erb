@@ -1,0 +1,135 @@
+<h1 class="text-2xl font-bold text-center my-6 text-gray-800"><%= t("scan_qr.title") %></h1>
+
+<div class="flex flex-col items-center space-y-6">
+  <!-- Contenedor del escáner con animación -->
+  <div id="scanner-container" class="relative w-80 h-80 border-4 border-blue-500 rounded-lg shadow-lg overflow-hidden flex items-center justify-center bg-black">
+    <video id="qr-video" class="absolute inset-0 w-full h-full" autoplay playsinline></video>
+    <div id="animated-border"></div>
+  </div>
+
+  <!-- Campo de entrada manual -->
+  <div class="flex flex-col items-center space-y-2">
+    <input type="text" id="manual-code" placeholder="Ingrese el código (Ej: 10-5)" class="border p-2 rounded-md w-64 text-center" />
+    <button id="submit-code" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Confirmar Manualmente</button>
+  </div>
+
+  <!-- Mensaje de estado del escaneo -->
+  <p id="qr-result" class="text-lg font-semibold text-gray-600 bg-white px-4 py-2 rounded-md shadow">
+    <%= t("scan_qr.scanning_message") %>
+  </p>
+</div>
+
+<!-- Cargar librería jsQR -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const video = document.getElementById("qr-video");
+    const resultElement = document.getElementById("qr-result");
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+      .then(stream => {
+        video.srcObject = stream;
+        video.setAttribute("playsinline", true);
+        video.play();
+        requestAnimationFrame(scanQRCode);
+      })
+      .catch(err => {
+        console.error("Error al acceder a la cámara:", err);
+        resultElement.innerText = "No se pudo acceder a la cámara";
+        resultElement.classList.add("text-red-600");
+      });
+
+    function scanQRCode() {
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        let code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
+        
+        if (code) {
+          processCode(code.data);
+        }
+      }
+      requestAnimationFrame(scanQRCode);
+    }
+
+    function processCode(decodedText) {
+      let parts = decodedText.split("-");
+      if (parts.length === 2) {
+        let eventId = parts[0];
+        let userId = parts[1];
+        fetch(`/events/${eventId}/confirm_attendance?user_id=${userId}`, {
+          method: "POST",
+          headers: {
+            "X-CSRF-Token": document.querySelector("meta[name='csrf-token']").content,
+            "Content-Type": "application/json"
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            resultElement.innerText = "Asistencia confirmada";
+            resultElement.classList.add("text-green-600");
+          } else {
+            resultElement.innerText = "Error al confirmar asistencia";
+            resultElement.classList.add("text-red-600");
+          }
+        })
+        .catch(error => {
+          console.error("Error en la solicitud:", error);
+          resultElement.innerText = "Error en la solicitud";
+          resultElement.classList.add("text-red-600");
+        });
+      } else {
+        resultElement.innerText = "Código QR inválido";
+        resultElement.classList.add("text-red-600");
+      }
+    }
+
+    document.getElementById("submit-code").addEventListener("click", function() {
+      let manualCode = document.getElementById("manual-code").value;
+      processCode(manualCode);
+    });
+
+    document.getElementById("manual-code").addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        processCode(event.target.value);
+      }
+    });
+  });
+</script>
+
+<style>
+  /* Línea animada del escáner */
+  #animated-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: rgba(59, 130, 246, 0.8);
+    animation: scan-animation 2s infinite linear;
+    z-index: 20;
+  }
+
+  @keyframes scan-animation {
+    0% { top: 0; }
+    50% { top: 100%; }
+    100% { top: 0; }
+  }
+</style>
+
+
+
+
+
+
+
+
+
+

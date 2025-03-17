@@ -1,0 +1,11 @@
+<% content_for :title, "New label" %>
+
+<h1>New label</h1>
+
+<%= render "form", label: @label %>
+
+<br>
+
+<div>
+  <%= link_to "Back to labels", labels_path %>
+</div>

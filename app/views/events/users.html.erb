@@ -1,0 +1,43 @@
+<div class="max-w-4xl mx-auto bg-white p-6 shadow-md rounded-lg">
+  <h1 class="text-2xl font-bold text-center mb-6">👥 <%= t("event_users.title", event: @event.title) %></h1>
+
+  <% if @users.any? %>
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-lg">
+        <thead class="bg-gray-800 text-white">
+          <tr>
+            <th class="py-3 px-6 text-left"><%= t("event_users.name") %></th>
+            <th class="py-3 px-6 text-left"><%= t("event_users.email") %></th>
+            <th class="py-3 px-6 text-center"><%= t("event_users.phone") %></th>
+            <th class="py-3 px-6 text-center"><%= t("event_users.attendance") %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @users.each do |user| %>
+            <tr class="border-b transition duration-300 ease-in-out hover:bg-gray-100">
+              <td class="py-4 px-6"><%= user.first_name %> <%= user.last_name %></td>
+              <td class="py-4 px-6"><%= user.email %></td>
+              <td class="py-4 px-6 text-center"><%= user.phone_number.presence || t("event_users.no_phone") %></td>
+              <td class="py-4 px-6 text-center">
+                <% event_user = EventUser.find_by(user: user, event: @event) %>
+                <% if event_user&.attended? %>
+                  <span class="text-green-600 font-semibold">✅ <%= t("event_users.attended") %></span>
+                <% else %>
+                  <span class="text-red-600 font-semibold">❌ <%= t("event_users.not_attended") %></span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="text-center text-gray-500 mt-6"><%= t("event_users.no_users") %></p>
+  <% end %>
+
+  <div class="mt-6 text-center">
+    <%= link_to "🔙 #{t("event_users.back")}", event_path(@event), class: "bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition duration-300" %>
+  </div>
+</div>
+
+

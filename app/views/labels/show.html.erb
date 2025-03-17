@@ -1,0 +1,32 @@
+<div class="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+  
+  <!-- ✅ Mensaje de éxito -->
+  <% if notice.present? %>
+    <p class="bg-green-100 text-green-700 p-3 rounded-md mb-4 text-center"><%= notice %></p>
+  <% end %>
+
+  <!-- 🔖 Mostrar Etiqueta -->
+  <div class="bg-gray-100 p-4 rounded-lg shadow-md text-center">
+    <h2 class="text-2xl font-semibold text-gray-800"><%= @label.name %></h2>
+  </div>
+
+  <!-- 🔧 Acciones -->
+  <div class="mt-6 flex justify-center space-x-4">
+    <!-- ✏️ Editar Etiqueta -->
+    <%= link_to edit_label_path(@label), class: "px-4 py-2 bg-yellow-500 text-white rounded-md shadow-md hover:bg-yellow-600 transition" do %>
+      ✏️ <span class="font-bold">Editar etiqueta</span>
+    <% end %>
+
+    <!-- 🔙 Volver a Etiquetas -->
+    <%= link_to labels_path, class: "px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 transition" do %>
+      🔙 <span class="font-bold">Volver a etiquetas</span>
+    <% end %>
+
+    <!-- 🗑️ Eliminar Etiqueta -->
+    <%= button_to @label, method: :delete, data: { confirm: "¿Seguro que quieres eliminar esta etiqueta?" }, 
+      class: "px-4 py-2 bg-red-500 text-white rounded-md shadow-md hover:bg-red-600 transition" do %>
+      🗑️ <span class="font-bold">Eliminar</span>
+    <% end %>
+  </div>
+
+</div>

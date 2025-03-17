@@ -1,0 +1,54 @@
+<div class="container mx-auto p-6">
+  <h1 class="text-4xl font-bold text-center text-gray-800 mb-8"><%= t("labels.manage.title") %></h1>
+
+  <!-- ✅ Formulario para agregar etiquetas -->
+  <div class="max-w-lg mx-auto bg-white p-6 shadow-md rounded-lg">
+    <%= form_with model: @user, url: update_labels_users_path, method: :patch, local: true do |f| %>
+      <div class="mb-4">
+        <label class="block text-gray-700 font-semibold mb-2"><%= t("labels.manage.select") %></label>
+
+        <div class="grid grid-cols-2 gap-2">
+          <% Label.all.each do |label| %>
+            <% unless @user.labels.include?(label) %> <!-- Ocultar etiquetas ya seleccionadas -->
+              <div class="flex items-center bg-gray-100 p-2 rounded-md shadow-sm hover:bg-gray-200 transition">
+                <%= f.check_box :label_ids, { multiple: true }, label.id, class: "mr-2" %>
+                <%= label.name %>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="flex justify-between mt-4">
+        <%= f.submit t("labels.manage.save"), class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition" %>
+        <%= link_to t("labels.manage.cancel"), user_path(@user), class: "text-gray-600 hover:text-gray-800 font-semibold" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- ✅ Tarjeta con etiquetas actuales del usuario -->
+  <div class="max-w-lg mx-auto bg-white p-6 shadow-md rounded-lg mt-6">
+    <h2 class="text-xl font-semibold text-center mb-4"><%= t("labels.manage.current_labels") %></h2>
+
+    <% if @user.labels.any? %>
+      <div class="flex flex-wrap gap-2 justify-center">
+        <% @user.labels.each do |label| %>
+          <div class="bg-blue-100 text-blue-600 px-3 py-1 rounded-md flex items-center space-x-2 shadow-sm">
+            <span><%= label.name %></span>
+            <%= link_to remove_label_user_path(current_user, label_id: label.id), 
+                method: :delete, 
+                data: { confirm: t("labels.manage.confirm_remove") }, 
+                class: "text-red-500 hover:text-red-700 transition" do %>
+              ❌
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-gray-500 text-center"><%= t("labels.manage.no_labels") %></p>
+    <% end %>
+  </div>
+</div>
+
+
+

@@ -1,0 +1,61 @@
+<div class="max-w-6xl mx-auto p-6 bg-white shadow-md rounded-md">
+  <h1 class="text-3xl font-bold text-center mb-6"><%= t("users.index.title") %></h1>
+
+  <!-- Buscador -->
+  <%= search_form_for @q, url: users_path, method: :get, html: { class: "mb-6 flex flex-wrap gap-4 items-center justify-center" } do |f| %>
+    <div class="flex flex-col">
+      <%= f.label :first_name_cont, "🔎 Buscar por Nombre", class: "font-semibold text-gray-700" %>
+      <%= f.text_field :first_name_cont, class: "border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300" %>
+    </div>
+    <%= f.submit "Buscar", class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition" %>
+  <% end %>
+
+  <!-- Tabla de usuarios -->
+  <div class="overflow-x-auto">
+    <table class="w-full border-collapse border border-gray-200 shadow-md rounded-lg overflow-hidden">
+      <thead class="bg-blue-600 text-white">
+        <tr>
+          <th class="p-3"><%= t("users.index.name") %></th>
+          <th class="p-3"><%= t("users.index.email") %></th>
+          <th class="p-3"><%= t("users.index.phone") %></th>
+          <th class="p-3"><%= t("users.index.events") %></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <% @users.each do |user| %>
+          <tr class="hover:bg-gray-100 transition">
+            <td class="p-3"><%= user.first_name %> <%= user.last_name %></td>
+            <td class="p-3"><%= user.email %></td>
+            <td class="p-3"><%= user.phone_number %></td>
+            <td class="p-3">
+              <% if user.events.any? %>
+                <ul class="list-disc pl-4">
+                  <% user.events.each do |event| %>
+                    <li>
+                      <%= link_to event.title, event_path(event), class: "text-blue-600 hover:underline" %>
+                    </li>
+                  <% end %>
+                </ul>
+              <% else %>
+                <span class="text-gray-500">No registrado en eventos</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación -->
+  <div class="mt-6 flex justify-center">
+    <%= paginate @users %>
+
+  </div>
+
+  <!-- Botón de exportación (solo admin) -->
+  <% if current_user.has_role?(:admin) %>
+    <div class="mt-6 text-center">
+      <%= link_to "📥 Exportar Usuarios", export_xlsx_users_path, class: "bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition inline-flex items-center gap-2" %>
+    </div>
+  <% end %>
+</div>

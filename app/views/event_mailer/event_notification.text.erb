@@ -1,0 +1,14 @@
+📅 Nuevo evento disponible
+
+Hola <%= @user.first_name %>,
+
+Se ha creado un nuevo evento que coincide con tus intereses:
+
+Título: <%= @event.title %>
+Descripción: <%= @event.description %>
+Fecha de inicio: <%= @event.start_time.strftime("%d/%m/%Y %H:%M") %>
+Fecha de fin: <%= @event.end_time.strftime("%d/%m/%Y %H:%M") %>
+
+Puedes verlo aquí: <%= event_url(@event) %>
+
+Recibes este correo porque tienes etiquetas de interés relacionadas con este evento.
