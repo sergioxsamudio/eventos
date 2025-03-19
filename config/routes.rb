@@ -42,7 +42,6 @@ Rails.application.routes.draw do
       delete 'unregister' # Desinscribirse del evento
       get 'users', to: 'events#users', as: 'event_users'
       get 'export_users_xlsx'
-      post 'deduct_points'
       post 'update_points'
     end
   end

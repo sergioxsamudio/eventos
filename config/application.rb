@@ -11,6 +11,7 @@ module Reto
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.0
   
+    config.i18n.fallbacks = [:en]
 
     # Configurar idiomas disponibles
     config.i18n.available_locales = [:es, :en]

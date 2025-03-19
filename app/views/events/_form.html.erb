@@ -18,14 +18,23 @@
 
     <!-- 📅 Fecha y Hora de Inicio -->
     <div>
-      <%= form.label :start_time, t("events.form.start_time"), class: "block text-gray-700 font-semibold mb-1" %>
-      <%= form.datetime_select :start_time, include_blank: false, default: Time.current, class: "border border-gray-300 rounded-md p-3 w-full focus:ring focus:ring-blue-300" %>
-    </div>
+  <%= form.label :start_time, I18n.t("events.form.start_time"), class: "block text-gray-700 font-semibold mb-1" %>
+  <%= form.datetime_select :start_time, 
+  { include_blank: true, locale: :en },  
+  { class: "border border-gray-300 rounded-md p-3 w-full focus:ring focus:ring-blue-300" } 
+%>
+
+</div>
+
 
     <!-- 📅 Fecha y Hora de Fin -->
     <div>
       <%= form.label :end_time, t("events.form.end_time"), class: "block text-gray-700 font-semibold mb-1" %>
-      <%= form.datetime_select :end_time, include_blank: false, default: Time.current + 1.hour, class: "border border-gray-300 rounded-md p-3 w-full focus:ring focus:ring-blue-300" %>
+      <%= form.datetime_select :end_time, 
+  { include_blank: true, locale: :en},  # Opciones de fecha/hora
+  { class: "border border-gray-300 rounded-md p-3 w-full focus:ring focus:ring-blue-300" } # Opciones HTML
+%>
+
     </div>
 
     <!-- 🔖 Etiquetas -->

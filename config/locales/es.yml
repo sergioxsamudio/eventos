@@ -1,5 +1,13 @@
 es:
   hello: "Hola"
+
+  date:
+    formats:
+      default: "%d/%m/%Y"
+  time:
+    formats:
+      default: "%H:%M"
+
   event_users:
     title: "Usuarios Inscritos en %{event}"
     name: "Nombre"
@@ -38,15 +46,13 @@ es:
       confirm_delete: "¿Estás seguro de que deseas eliminar este evento?"
       confirm_update_points: "¿Actualizar los puntos de los usuarios?"
       update_points: "Actualizar Puntos"
-
-
     form:
+      start_time: "Fecha de inicio"
+      end_time: "Fecha de finalización"
       title: "Título del evento"
       description: "Descripción"
-      start_time: "Fecha y hora de inicio"
-      end_time: "Fecha y hora de fin"
       labels: "Etiquetas"
-      submit: "Guardar evento"
+      submit: "Crear evento"
     my_events:
       title: "Mis Eventos"
       image: "Imagen"

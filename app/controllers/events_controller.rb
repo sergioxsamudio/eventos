@@ -1,9 +1,6 @@
-
 class EventsController < ApplicationController
   before_action :authenticate_user!
   before_action :authorize_admin, only: [:new, :create, :edit, :update, :destroy, :export_xlsx]
-  before_action :set_event, only: [:show, :edit, :update, :destroy, :register, :unregister]
-  before_action :set_event, only: [:show, :edit, :update, :destroy, :register, :unregister, :users]
   before_action :set_event, only: [:show, :edit, :update, :destroy, :register, :unregister, :users, :export_users_xlsx]
 
   rescue_from ActiveRecord::RecordNotFound, with: :handle_record_not_found
@@ -16,12 +13,18 @@ class EventsController < ApplicationController
   def show
   end
 
+  # ✅ Inicializa el evento con valores predeterminados para `start_time` y `end_time`
   def new
-    @event = Event.new
-  end
+    @event = Event.new(start_time: Time.current, end_time: Time.current + 1.hour)
 
+  end
+  
   def create
     @event = Event.new(event_params)
+
+    # Convierte `start_time` y `end_time` a objetos de tipo `DateTime`
+    
+    @event.end_time = Time.zone.parse(params[:event][:end_time]) if params[:event][:end_time].present?
 
     if @event.save
       notify_interested_users(@event)
@@ -34,8 +37,13 @@ class EventsController < ApplicationController
   def edit
   end
 
+  # ✅ Actualiza el evento y convierte `start_time` y `end_time` a objetos de tipo `DateTime`
   def update
     if @event.update(event_params)
+      # Convierte `start_time` y `end_time` a objetos de tipo `DateTime`
+      @event.start_time = Time.zone.parse(params[:event][:start_time]) if params[:event][:start_time].present?
+      @event.end_time = Time.zone.parse(params[:event][:end_time]) if params[:event][:end_time].present?
+
       redirect_to @event, notice: "El evento fue actualizado exitosamente."
     else
       render :edit, status: :unprocessable_entity
@@ -138,6 +146,7 @@ class EventsController < ApplicationController
       redirect_to @event, alert: "No estás inscrito en este evento."
     end
   end
+
   def export_users_xlsx
     return redirect_to events_path, alert: "Evento no encontrado." if @event.nil?
   
@@ -148,7 +157,8 @@ class EventsController < ApplicationController
       format.html { redirect_to event_path(@event), alert: "El formato solicitado no es válido." }
     end
   end
-  def deduct_points
+
+  def update_points
     @event = Event.find(params[:id])
     @event.update(points_deducted: true)
   
@@ -156,7 +166,7 @@ class EventsController < ApplicationController
     @event.users.each do |user|
       event_user = EventUser.find_by(event: @event, user: user)
       if event_user && !event_user.attended?
-        user.update(points: user.points - 300)  # Restar 300 puntos
+        user.update(score: user.score - 300)  # Restar 300 puntos
       end
     end
   
@@ -165,19 +175,27 @@ class EventsController < ApplicationController
 
   private
 
+  # ✅ Busca el evento por ID o redirige si no se encuentra
   def set_event
     @event = Event.find_by(id: params[:id])
     return redirect_to events_path, alert: "Evento no encontrado." if @event.nil?
   end
 
+  # ✅ Filtra y limpia los parámetros del evento
   def event_params
     params.require(:event).permit(:title, :description, :start_time, :end_time, images: [], label_ids: []).tap do |whitelisted|
       whitelisted[:label_ids] = params[:event][:label_ids].reject(&:blank?) if params[:event][:label_ids].is_a?(Array)
     end
   end
 
+  # ✅ Autoriza solo a los administradores
   def authorize_admin
     redirect_to root_path, alert: "No tienes permisos para realizar esta acción." unless current_user.has_role?(:admin)
+  end
+
+  # ✅ Maneja el error de registro no encontrado
+  def handle_record_not_found
+    redirect_to events_path, alert: "El evento no existe o no se pudo encontrar."
   end
 end
 
